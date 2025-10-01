@@ -88,18 +88,16 @@ details {{ margin-bottom: 10px; }}
 
 # Build TOC
 for i, entry in enumerate(recent_entries):
-    title = entry.title
+    title = entry["title"]
     html_content += f'<li><a href="#paper{i}">{title}</a></li>\n'
-
-html_content += "</ul>\n<hr>\n"
 
 # Add papers with collapsible abstracts
 for i, entry in enumerate(recent_entries):
-    title = entry.title
-    authors = ", ".join(author.name for author in entry.authors)
-    link = entry.link
-    summary = entry.summary.replace("\n", " ").strip()
-    main_cat = entry.tags[0]["term"] if entry.tags else "cs.RO"
+    title = entry["title"]
+    authors = ", ".join(author["name"] for author in entry["authors"])
+    link = entry["link"]
+    summary = entry["summary"].replace("\n", " ").strip()
+    main_cat = entry["tags"][0]["term"] if "tags" in entry and entry["tags"] else "cs.RO"
     color = category_colors.get(main_cat, "#000000")
 
     html_content += f"""
@@ -111,6 +109,7 @@ for i, entry in enumerate(recent_entries):
     </details>
     <hr>
     """
+
 
 if not recent_entries:
     html_content += "<p>No new papers this week.</p>"
