@@ -1,0 +1,29 @@
+name: Weekly arXiv Newsletter
+
+on:
+  schedule:
+    - cron: '0 9 * * MON'  # Every Monday 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  send_alert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install feedparser
+
+      - name: Run arXiv Newsletter script
+        env:
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
+        run: python arxiv_alerts_weekly.py
