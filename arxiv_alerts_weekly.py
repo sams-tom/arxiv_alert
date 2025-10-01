@@ -4,21 +4,15 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
-from openai import OpenAI
 import os
+from transformers import pipeline
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+summarizer = pipeline("summarization")
 
 def summarize_abstract(abstract):
-    prompt = f"Summarize the following abstract in 1-2 sentences, focusing on the main contribution:\n\n{abstract}"
-    
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3
-    )
-    
-    return response.choices[0].message.content.strip()
+    summary = summarizer(abstract, max_length=80, min_length=20, do_sample=False)
+    return summary[0]['summary_text']
+
 
 keywords = [
     "marine robotics", "underwater", "AUV", "side scan", "bathymetry",
