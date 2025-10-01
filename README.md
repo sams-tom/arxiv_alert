@@ -102,6 +102,7 @@ Use ChatGPT to generate large lists of allied keywords.
 
 Adjust max_results in the arXiv query to fetch more papers:
 (its the 5000 in the url below, increase this if required)
+
 url = f"{base_url}search_query={search_query}&start=0&max_results=5000&sortBy=submittedDate&sortOrder=descending"
 
 7. Support / Contributions
