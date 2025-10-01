@@ -23,7 +23,7 @@ TO_EMAIL = os.environ.get("TO_EMAIL")
 search_query = "cat:cs.RO+OR+cat:cs.CV+OR+cat:stat.ML"
 base_url = "http://export.arxiv.org/api/query?"
 search_query = "cat:cs.RO+OR+cat:cs.CV+OR+cat:stat.ML"
-url = f"{base_url}search_query={search_query}&start=0&max_results=100&sortBy=submittedDate&sortOrder=descending"
+url = f"{base_url}search_query={search_query}&start=0&max_results=5000&sortBy=submittedDate&sortOrder=descending"
 
 feed = feedparser.parse(url)
 
