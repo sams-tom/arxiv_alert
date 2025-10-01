@@ -94,7 +94,10 @@ for i, entry in enumerate(recent_entries):
 # Add papers with collapsible abstracts
 for i, entry in enumerate(recent_entries):
     title = entry["title"]
-    authors = ", ".join(author["name"] for author in entry["authors"])
+    if "authors" in entry and entry["authors"]:
+        authors = ", ".join(author.get("name", "Unknown") for author in entry["authors"])
+    else:
+        authors = "Unknown"
     link = entry["link"]
     summary = entry["summary"].replace("\n", " ").strip()
     main_cat = entry["tags"][0]["term"] if "tags" in entry and entry["tags"] else "cs.RO"
