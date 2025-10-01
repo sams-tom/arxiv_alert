@@ -1,0 +1,121 @@
+import feedparser
+from datetime import datetime, timedelta
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import os
+
+# ----------------
+# SETTINGS
+# ----------------
+EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS")
+EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
+TO_EMAIL = os.environ.get("TO_EMAIL")
+
+# ----------------
+# ARXIV QUERY
+# ----------------
+base_url = "http://export.arxiv.org/api/query?"
+
+search_query = (
+    'cat:cs.RO+OR+cat:cs.CV+OR+cat:stat.ML+AND+('
+    '"marine+robotics"+OR+"underwater"+OR+"AUV"+OR+"side+scan"+OR+"bathymetry"+OR+'
+    '"multimodal+fusion"+OR+"multimodal+machine+learning"+OR+"knowledge+distillation"+OR+'
+    '"uncertainty+quantification"+OR+"BNN"+OR+"hyperspectral"+OR+"SWIR"'
+    ')'
+)
+
+url = f"{base_url}search_query={search_query}&start=0&max_results=100&sortBy=submittedDate&sortOrder=descending"
+
+feed = feedparser.parse(url)
+
+# ----------------
+# FILTER PAPERS FROM LAST 7 DAYS
+# ----------------
+one_week_ago = datetime.utcnow() - timedelta(days=7)
+recent_entries = []
+for entry in feed.entries:
+    pub_date = datetime.strptime(entry.published, "%Y-%m-%dT%H:%M:%SZ")
+    if pub_date > one_week_ago:
+        recent_entries.append(entry)
+
+# ----------------
+# CATEGORY COLORS
+# ----------------
+category_colors = {
+    "cs.RO": "#1f77b4",     # blue
+    "cs.CV": "#ff7f0e",     # orange
+    "stat.ML": "#2ca02c"    # green
+}
+
+# ----------------
+# BUILD HTML CONTENT
+# ----------------
+today = datetime.today().strftime("%Y-%m-%d")
+html_content = f"""
+<html>
+<head>
+<style>
+body {{ font-family: Arial, sans-serif; }}
+h1 {{ color: #333; }}
+h2 {{ margin-top: 20px; }}
+.summary {{ margin-bottom: 15px; }}
+details {{ margin-bottom: 10px; }}
+</style>
+</head>
+<body>
+<h1>arXiv Weekly Digest – {today}</h1>
+<p>Filtered by categories: cs.RO, cs.CV, stat.ML | Keywords: marine, underwater, multimodal</p>
+<hr>
+<h2>Table of Contents</h2>
+<ul>
+"""
+
+# Build TOC
+for i, entry in enumerate(recent_entries):
+    title = entry.title
+    html_content += f'<li><a href="#paper{i}">{title}</a></li>\n'
+
+html_content += "</ul>\n<hr>\n"
+
+# Add papers with collapsible abstracts
+for i, entry in enumerate(recent_entries):
+    title = entry.title
+    authors = ", ".join(author.name for author in entry.authors)
+    link = entry.link
+    summary = entry.summary.replace("\n", " ").strip()
+    main_cat = entry.tags[0]["term"] if entry.tags else "cs.RO"
+    color = category_colors.get(main_cat, "#000000")
+
+    html_content += f"""
+    <h2 id="paper{i}" style="color:{color};"><a href="{link}">{title}</a> [{main_cat}]</h2>
+    <p><strong>Authors:</strong> {authors}</p>
+    <details>
+      <summary>Abstract (click to expand)</summary>
+      <p class="summary">{summary}</p>
+    </details>
+    <hr>
+    """
+
+if not recent_entries:
+    html_content += "<p>No new papers this week.</p>"
+
+html_content += "</body></html>"
+
+# ----------------
+# SEND EMAIL
+# ----------------
+msg = MIMEMultipart("alternative")
+msg["From"] = EMAIL_ADDRESS
+msg["To"] = TO_EMAIL
+msg["Subject"] = f"Weekly arXiv Digest – {today}"
+msg.attach(MIMEText(html_content, "html"))
+
+try:
+    with smtplib.SMTP("smtp.office365.com", 587) as server:
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        server.sendmail(EMAIL_ADDRESS, TO_EMAIL, msg.as_string())
+    print(f"Weekly newsletter sent to {TO_EMAIL} with {len(recent_entries)} papers.")
+except Exception as e:
+    print("Error sending email:", e)
