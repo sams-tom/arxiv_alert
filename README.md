@@ -29,7 +29,7 @@ Go to your fork → **Settings → Secrets and variables → Actions → New rep
 
 | Secret Name       | Description |
 |------------------|------------|
-| `EMAIL_ADDRESS`   | Your email (Gmail required unless you edit the code). |
+| `EMAIL_ADDRESS`   | The email that will send an email ( This must be a gmail account unless you edit the code). |
 | `EMAIL_PASSWORD`  | Your **app password**, not your normal login password. [Gmail App Passwords] Go down to "create and use App passwords, copy the password when shown as youre only shown it once: (https://support.google.com/accounts/answer/185833?hl=en) |
 | `TO_EMAIL`        | Where to send the newsletter (can be the same as `EMAIL_ADDRESS`). |
 
@@ -71,7 +71,7 @@ keywords = [
     "uncertainty", "bayesian inference", "posterior predictive", "error estimation",
     "confidence estimation", "probabilistic prediction", "multimodal integration"
 ]
-
+```
 4. Workflow
 
 The workflow .github/workflows/arxiv_newsletter.yml:
