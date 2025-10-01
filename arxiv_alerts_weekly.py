@@ -7,7 +7,7 @@ import os
 import os
 from transformers import pipeline
 
-summarizer = pipeline("summarization")
+summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
 
 def summarize_abstract(abstract):
     summary = summarizer(abstract, max_length=80, min_length=20, do_sample=False)
