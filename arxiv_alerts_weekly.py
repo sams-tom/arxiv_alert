@@ -15,29 +15,37 @@ TO_EMAIL = os.environ.get("TO_EMAIL")
 # ----------------
 # ARXIV QUERY
 # ----------------
+search_query = "cat:cs.RO+OR+cat:cs.CV+OR+cat:stat.ML"
 base_url = "http://export.arxiv.org/api/query?"
-
-search_query = (
-    'cat:cs.RO+OR+cat:cs.CV+OR+cat:stat.ML+AND+('
-    '"marine+robotics"+OR+"underwater"+OR+"AUV"+OR+"side+scan"+OR+"bathymetry"+OR+'
-    '"multimodal+fusion"+OR+"multimodal+machine+learning"+OR+"knowledge+distillation"+OR+'
-    '"uncertainty+quantification"+OR+"BNN"+OR+"hyperspectral"+OR+"SWIR"'
-    ')'
-)
-
+search_query = "cat:cs.RO+OR+cat:cs.CV+OR+cat:stat.ML"
 url = f"{base_url}search_query={search_query}&start=0&max_results=100&sortBy=submittedDate&sortOrder=descending"
 
 feed = feedparser.parse(url)
 
 # ----------------
-# FILTER PAPERS FROM LAST 7 DAYS
+# FILTER LAST 7 DAYS + KEYWORD SCORE
 # ----------------
 one_week_ago = datetime.utcnow() - timedelta(days=7)
 recent_entries = []
+
 for entry in feed.entries:
     pub_date = datetime.strptime(entry.published, "%Y-%m-%dT%H:%M:%SZ")
-    if pub_date > one_week_ago:
-        recent_entries.append(entry)
+    if pub_date < one_week_ago:
+        continue
+
+    text = (entry.title + " " + entry.summary).lower()
+    score = sum(1 for kw in keywords if kw.lower() in text)
+
+    if score > 0:
+        recent_entries.append({
+            "title": entry.title,
+            "link": entry.link,
+            "summary": entry.summary,
+            "published": pub_date.strftime("%Y-%m-%d"),
+            "score": score
+        })
+
+print(f"Found {len(recent_entries)} new papers this week.")
 
 # ----------------
 # CATEGORY COLORS
