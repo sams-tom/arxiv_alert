@@ -4,7 +4,12 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
-
+keywords = [
+    "marine robotics", "underwater", "AUV", "side scan", "bathymetry",
+    "multimodal fusion", "multimodal machine learning", "knowledge distillation",
+    "uncertainty quantification", "BNN", "hyperspectral", "SWIR", "bayesian neural network", 
+    "Autonomous Underwater Vehicle", "Uncertainty", "Computer Vision"
+]
 # ----------------
 # SETTINGS
 # ----------------
