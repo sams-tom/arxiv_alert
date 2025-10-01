@@ -19,7 +19,8 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install feedparser openai
+        run: pip install feedparse transformers torch
+
 
 
       - name: Run arXiv Newsletter script
