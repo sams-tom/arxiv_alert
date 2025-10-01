@@ -19,7 +19,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install feedparse transformers torch
+        run: pip install feedparser transformers torch
 
 
 
