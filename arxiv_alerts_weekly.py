@@ -46,6 +46,7 @@ for entry in feed.entries:
        recent_entries.append({
     "title": entry["title"],
     "link": entry["link"],
+    "authors": entry["authors"],
     "summary": entry["summary"],
     "published": pub_date.strftime("%Y-%m-%d"),
     "score": score
