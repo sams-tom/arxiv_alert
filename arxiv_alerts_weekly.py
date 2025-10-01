@@ -30,7 +30,8 @@ feed = feedparser.parse(url)
 # ----------------
 # FILTER LAST 7 DAYS + KEYWORD SCORE
 # ----------------
-one_week_ago = datetime.utcnow() - timedelta(days=7)
+one_week_ago = datetime.utcnow() - timedelta(days=100)
+
 recent_entries = []
 
 for entry in feed.entries:
