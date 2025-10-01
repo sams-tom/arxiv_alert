@@ -19,7 +19,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install feedparser, openai
+        run: pip install feedparser openai
 
 
       - name: Run arXiv Newsletter script
