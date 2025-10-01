@@ -76,13 +76,18 @@ keywords = [
 
 The workflow .github/workflows/arxiv_newsletter.yml:
 
-Runs every Monday at 09:00 UTC.
+It will automatically run every Monday at 09:00 UTC.  
+- Can also be **manually triggered** from GitHub Actions:  
+  1. Click on the **Actions** tab at the top of the page.  
+  2. Click **"Weekly arXiv Newsletter"** in the left-hand column.  
+  3. Click **Run workflow** on the right-hand side.  
+  4. Click the green **Run workflow** button.  
+  5. The workflow should now run (may take up to ~3 minutes due to summarization on GitHub CPU).  
 
-Can also be manually triggered from GitHub Actions.
-Note for new github users: Click on the actions tab at the top of the page -> click "Weekly arXiv Newsletter" on the left hand column -> Click run work flow on the right hand side -> click the green run workflow box.
-It should now run, and it can take up to 3 minutes due to local (to github servers not your laptop) summarising of abstracts on cpu. Eventually the run should show a green tick, if a red cross you can debug from here or contact me at: phd01tm@sams.ac.uk and I can help.
+- Once completed, the run will show a **green tick** and send you an email.  
+  - If you see a **red cross**, you can debug from the Actions page or contact me at `phd01tm@sams.ac.uk`.  
 
-Automatically installs dependencies (feedparser, transformers, torch) and runs the script.
+- Automatically installs dependencies (`feedparser`, `transformers`, `torch`) and runs the script.
 
 5. Output
 
