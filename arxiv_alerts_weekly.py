@@ -4,6 +4,22 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
+from openai import OpenAI
+import os
+
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+def summarize_abstract(abstract):
+    prompt = f"Summarize the following abstract in 1-2 sentences, focusing on the main contribution:\n\n{abstract}"
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3
+    )
+    
+    return response.choices[0].message.content.strip()
+
 keywords = [
     "marine robotics", "underwater", "AUV", "side scan", "bathymetry",
     "multimodal fusion", "multimodal machine learning", "knowledge distillation",
@@ -41,13 +57,15 @@ for entry in feed.entries:
 
     text = (entry["title"] + " " + entry["summary"]).lower()
     score = sum(1 for kw in keywords if kw.lower() in text)
-
+    
     if score > 0:
+       full_summary = entry["summary"].replace("\n", " ").strip()
+       summary = summarize_abstract(full_summary)
        recent_entries.append({
     "title": entry["title"],
     "link": entry["link"],
     "authors": entry["authors"],
-    "summary": entry["summary"],
+    "summary": summary, 
     "published": pub_date.strftime("%Y-%m-%d"),
     "score": score
 })
