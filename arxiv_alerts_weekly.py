@@ -112,10 +112,11 @@ msg["Subject"] = f"Weekly arXiv Digest – {today}"
 msg.attach(MIMEText(html_content, "html"))
 
 try:
-    with smtplib.SMTP("smtp.office365.com", 587) as server:
+   with smtplib.SMTP("smtp.gmail.com", 587) as server:
         server.starttls()
         server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         server.sendmail(EMAIL_ADDRESS, TO_EMAIL, msg.as_string())
+
     print(f"Weekly newsletter sent to {TO_EMAIL} with {len(recent_entries)} papers.")
 except Exception as e:
     print("Error sending email:", e)
