@@ -15,11 +15,33 @@ def summarize_abstract(abstract):
 
 
 keywords = [
-    "marine robotics", "underwater", "AUV", "side scan", "bathymetry",
-    "multimodal fusion", "multimodal machine learning", "knowledge distillation",
-    "uncertainty quantification", "BNN", "hyperspectral", "SWIR", "bayesian neural network", 
-    "Autonomous Underwater Vehicle", "Uncertainty", "Computer Vision"
+    # Robotics & marine vehicles
+    "marine robotics", "underwater robotics", "AUV", "autonomous underwater vehicle",
+    "ROV", "remotely operated vehicle", "glider", "surface vehicle", "drone",
+    
+    # Sensing modalities
+    "side scan sonar", "multibeam sonar", "bathymetry", "imagery", "photogrammetry",
+    "multimodal sensing", "multimodal fusion", "hyperspectral", "SWIR", "thermal imaging",
+    "optical imagery", "lidar", "acoustic imaging", "sonar imaging",
+    
+    # Machine learning & modeling
+    "multimodal machine learning", "knowledge distillation", "deep learning",
+    "bayesian neural network", "BNN", "uncertainty quantification", "probabilistic model",
+    "computer vision", "image processing", "feature extraction", "sensor fusion",
+    
+    # Applications
+    "benthic habitat mapping", "carbon mapping", "intertidal sediments",
+    "environmental monitoring", "marine ecology", "seafloor mapping",
+    
+    # Techniques & methods
+    "model robustness", "data augmentation", "simulation", "domain adaptation",
+    "transfer learning", "predictive modeling", "sensor degradation", "noise robustness",
+    
+    # Keywords variations
+    "uncertainty", "bayesian inference", "posterior predictive", "error estimation",
+    "confidence estimation", "probabilistic prediction", "multimodal integration"
 ]
+
 # ----------------
 # SETTINGS
 # ----------------
@@ -41,8 +63,11 @@ feed = feedparser.parse(url)
 # FILTER LAST 7 DAYS + KEYWORD SCORE
 # ----------------
 one_week_ago = datetime.utcnow() - timedelta(days=7)
-
-recent_entries = []
+# ----------------
+# FILTER LAST 7 DAYS + KEYWORD SCORE
+# ----------------
+one_week_ago = datetime.utcnow() - timedelta(days=7)
+scored_entries = []
 
 for entry in feed.entries:
     pub_date = datetime.strptime(entry.published, "%Y-%m-%dT%H:%M:%SZ")
@@ -51,22 +76,29 @@ for entry in feed.entries:
 
     text = (entry["title"] + " " + entry["summary"]).lower()
     score = sum(1 for kw in keywords if kw.lower() in text)
-    
+
     if score > 0:
-       full_summary = entry["summary"].replace("\n", " ").strip()
-       summary = summarize_abstract(full_summary)
-       recent_entries.append({
-    "title": entry["title"],
-    "link": entry["link"],
-    "authors": entry["authors"],
-    "summary": summary, 
-    "published": pub_date.strftime("%Y-%m-%d"),
-    "score": score
-})
+        scored_entries.append({
+            "title": entry["title"],
+            "link": entry["link"],
+            "authors": entry["authors"],
+            "summary_full": entry["summary"].replace("\n", " ").strip(),
+            "published": pub_date.strftime("%Y-%m-%d"),
+            "score": score
+        })
 
+# Sort by keyword score descending
+scored_entries.sort(key=lambda x: x["score"], reverse=True)
 
+# Keep only top 20
+recent_entries = scored_entries[:20]
 
-print(f"Found {len(recent_entries)} new papers this week.")
+# Summarize abstracts for these top papers
+for entry in recent_entries:
+    entry["summary"] = summarize_abstract(entry["summary_full"])
+
+print(f"Found {len(recent_entries)} top papers this week.")
+
 
 # ----------------
 # CATEGORY COLORS
