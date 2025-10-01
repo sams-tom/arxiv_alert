@@ -116,7 +116,6 @@ try:
         server.starttls()
         server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         server.sendmail(EMAIL_ADDRESS, TO_EMAIL, msg.as_string())
-
-    print(f"Weekly newsletter sent to {TO_EMAIL} with {len(recent_entries)} papers.")
+        print(f"Weekly newsletter sent to {TO_EMAIL} with {len(recent_entries)} papers.")
 except Exception as e:
     print("Error sending email:", e)
