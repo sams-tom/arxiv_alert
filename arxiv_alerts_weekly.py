@@ -38,17 +38,19 @@ for entry in feed.entries:
     if pub_date < one_week_ago:
         continue
 
-    text = (entry.title + " " + entry.summary).lower()
+    text = (entry["title"] + " " + entry["summary"]).lower()
     score = sum(1 for kw in keywords if kw.lower() in text)
 
     if score > 0:
-        recent_entries.append({
-            "title": entry.title,
-            "link": entry.link,
-            "summary": entry.summary,
-            "published": pub_date.strftime("%Y-%m-%d"),
-            "score": score
-        })
+       recent_entries.append({
+    "title": entry["title"],
+    "link": entry["link"],
+    "summary": entry["summary"],
+    "published": pub_date.strftime("%Y-%m-%d"),
+    "score": score
+})
+
+
 
 print(f"Found {len(recent_entries)} new papers this week.")
 
