@@ -58,21 +58,34 @@ search_query = "cat:cs.RO+OR+cat:cs.CV+OR+cat:stat.ML"
 url = f"{base_url}search_query={search_query}&start=0&max_results=5000&sortBy=submittedDate&sortOrder=descending"
 
 feed = feedparser.parse(url)
+if not feed.entries:
+    print("Warning: empty feed, retrying in 30s...")
+    time.sleep(30)
+    feed = feedparser.parse(url)
+# ----------------
+# FILTER LAST 7 DAYS (14 as fall back) + KEYWORD SCORE
+# ----------------
+# Use a 14-day window or flexible fallback
+# ----------------
+# FILTER LAST 7 DAYS (14 as fallback) + KEYWORD SCORE
+# ----------------
 
-# ----------------
-# FILTER LAST 7 DAYS + KEYWORD SCORE
-# ----------------
-one_week_ago = datetime.utcnow() - timedelta(days=7)
-# ----------------
-# FILTER LAST 7 DAYS + KEYWORD SCORE
-# ----------------
-one_week_ago = datetime.utcnow() - timedelta(days=7)
 scored_entries = []
 
-for entry in feed.entries:
+# Primary window: last 7 days
+days_back = 7
+cutoff_date = datetime.utcnow() - timedelta(days=days_back)
+entries = [e for e in feed.entries if datetime.strptime(e.published, "%Y-%m-%dT%H:%M:%SZ") > cutoff_date]
+
+# Fallback: if none found, extend to 14 days
+if not entries:
+    days_back = 14
+    cutoff_date = datetime.utcnow() - timedelta(days=days_back)
+    entries = [e for e in feed.entries if datetime.strptime(e.published, "%Y-%m-%dT%H:%M:%SZ") > cutoff_date]
+
+# Score and filter entries
+for entry in entries:
     pub_date = datetime.strptime(entry.published, "%Y-%m-%dT%H:%M:%SZ")
-    if pub_date < one_week_ago:
-        continue
 
     text = (entry["title"] + " " + entry["summary"]).lower()
     score = sum(1 for kw in keywords if kw.lower() in text)
@@ -86,6 +99,7 @@ for entry in feed.entries:
             "published": pub_date.strftime("%Y-%m-%d"),
             "score": score
         })
+
 
 # Sort by keyword score descending
 scored_entries.sort(key=lambda x: x["score"], reverse=True)
