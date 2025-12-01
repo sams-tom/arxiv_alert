@@ -7,6 +7,7 @@ import os
 import os
 from transformers import pipeline
 import time
+from urllib.parse import quote
 summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
 
 def summarize_abstract(abstract):
@@ -52,14 +53,17 @@ TO_EMAIL = os.environ.get("TO_EMAIL")
 # ----------------
 # ARXIV QUERY
 # ----------------
-search_query = "cat:cs.RO+OR+cat:cs.CV+OR+cat:stat.ML"
+
+feedparser.USER_AGENT = "my-research-bot/0.1 (me@example.com)"
+
 base_url = "http://export.arxiv.org/api/query?"
-search_query = "cat:cs.RO+OR+cat:cs.CV+OR+cat:stat.ML"
-url = f"{base_url}search_query={search_query}&start=0&max_results=5000&sortBy=submittedDate&sortOrder=descending"
+search_query = "(cat:cs.RO OR cat:cs.CV OR cat:stat.ML)"
+url = f"{base_url}search_query={quote(search_query)}&start=0&max_results=1000&sortBy=submittedDate&sortOrder=descending"
 
 feed = feedparser.parse(url)
+
 if not feed.entries:
-    print("Warning: empty feed, retrying in 30s...")
+    print("Warning: empty feed, retrying...")
     time.sleep(30)
     feed = feedparser.parse(url)
 # ----------------
